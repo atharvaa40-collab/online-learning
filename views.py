@@ -1,15 +1,23 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse
 from .models import Question, Choice, Submission
 
 
 def submit(request):
     if request.method == "POST":
+        # Clear previous submissions
+        Submission.objects.all().delete()
+
+        # Save the selected choice for each question
         for question in Question.objects.all():
             choice_id = request.POST.get(f"question_{question.id}")
 
             if choice_id:
-                choice = get_object_or_404(Choice, id=choice_id)
+                choice = get_object_or_404(
+                    Choice,
+                    id=choice_id,
+                    question=question
+                )
+
                 Submission.objects.create(
                     question=question,
                     choice=choice
@@ -21,19 +29,23 @@ def submit(request):
 
 
 def show_exam_result(request):
-    submissions = Submission.objects.all()
+    submissions = Submission.objects.select_related(
+        "question",
+        "choice"
+    ).all()
 
     total_questions = Question.objects.count()
-    correct_answers = 0
-
-    for submission in submissions:
-        if submission.choice.question_id == submission.question_id:
-            correct_answers += 1
+    answered_questions = submissions.count()
 
     context = {
         "submissions": submissions,
         "total_questions": total_questions,
-        "correct_answers": correct_answers,
+        "answered_questions": answered_questions,
+        "correct_answers": answered_questions,
+        "score": (
+            (answered_questions / total_questions) * 100
+            if total_questions > 0 else 0
+        ),
     }
 
     return render(request, "exam_result.html", context)

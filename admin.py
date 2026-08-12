@@ -19,12 +19,22 @@ class QuestionAdmin(admin.ModelAdmin):
     inlines = [ChoiceInline]
 
 
+class LessonInline(admin.TabularInline):
+    model = Lesson
+    extra = 1
+
+
+class SectionInline(admin.TabularInline):
+    model = Section
+    extra = 1
+
+
 @admin.register(Course)
 class CourseAdmin(admin.ModelAdmin):
     list_display = ('title', 'instructor', 'price', 'is_published', 'created_at')
     list_filter = ('is_published', 'created_at')
     search_fields = ('title', 'description', 'instructor__username')
-    inlines = [SectionInline] if 'SectionInline' in globals() else []
+    inlines = [SectionInline]
 
 
 @admin.register(Section)
@@ -32,12 +42,7 @@ class SectionAdmin(admin.ModelAdmin):
     list_display = ('title', 'course', 'order')
     list_filter = ('course',)
     search_fields = ('title', 'course__title')
-    inlines = [LessonInline] if 'LessonInline' in globals() else []
-
-
-class LessonInline(admin.TabularInline):
-    model = Lesson
-    extra = 1
+    inlines = [LessonInline]
 
 
 @admin.register(Lesson)
@@ -60,8 +65,3 @@ class ProgressAdmin(admin.ModelAdmin):
     list_display = ('enrollment', 'lesson', 'completed', 'last_position', 'updated_at')
     list_filter = ('completed', 'updated_at')
     search_fields = ('enrollment__user__username', 'lesson__title')
-
-
-class SectionInline(admin.TabularInline):
-    model = Section
-    extra = 1

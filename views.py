@@ -4,10 +4,8 @@ from .models import Question, Choice, Submission
 
 def submit(request):
     if request.method == "POST":
-        # Clear previous submissions
         Submission.objects.all().delete()
 
-        # Save the selected choice for each question
         for question in Question.objects.all():
             choice_id = request.POST.get(f"question_{question.id}")
 

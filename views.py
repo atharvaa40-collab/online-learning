@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .models import Question, Choice, Submission
 
 
-def submit(request):
+def submit(request, course_id):
     if request.method == "POST":
         Submission.objects.all().delete()
 
@@ -21,12 +21,16 @@ def submit(request):
                     choice=choice
                 )
 
-        return redirect("show_exam_result")
+        return redirect(
+            "show_exam_result",
+            course_id=course_id,
+            submission_id=1
+        )
 
-    return redirect("course_details")
+    return redirect("course_details", course_id=course_id)
 
 
-def show_exam_result(request):
+def show_exam_result(request, course_id, submission_id):
     submissions = Submission.objects.select_related(
         "question",
         "choice"

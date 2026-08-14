@@ -10,7 +10,6 @@ class ChoiceInline(admin.TabularInline):
 class QuestionInline(admin.TabularInline):
     model = Question
     extra = 1
-    inlines = [ChoiceInline]
 
 
 @admin.register(Question)
